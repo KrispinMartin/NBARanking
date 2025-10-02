@@ -1,0 +1,3 @@
+.segmentTabs { display: flex; gap: 8px; }
+.segmentBtn { background:#0e1a29;border:1px solid #1f2d40;border-radius:8px;padding:6px 10px;color:#8aa0b2; }
+.active { color: #fff; border-color:#5fd3ff; }

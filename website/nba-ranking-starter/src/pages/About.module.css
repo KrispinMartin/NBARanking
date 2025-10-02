@@ -1,0 +1,40 @@
+.intro {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #c6d6e8;
+}
+
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.member {
+  text-align: center;
+  background: #0e1a29;
+  border: 1px solid #1f2d40;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 900px) {
+  .teamGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .teamGrid {
+    grid-template-columns: 1fr;
+  }
+}

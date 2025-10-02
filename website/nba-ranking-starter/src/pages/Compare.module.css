@@ -1,0 +1,19 @@
+.playerGrid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+@media (max-width: 1000px){ .playerGrid { grid-template-columns: repeat(2, 1fr); } }
+
+.dropdown {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  appearance: none; /* remove default arrow */
+}
+
+.dropdown option {
+  background: #0e1a29; /* dropdown menu bg */
+  color: #fff;
+}

@@ -1,0 +1,13 @@
+.stickyHeader { position: sticky; top: 64px; background: #132338; z-index: 5; }
+.clickable { cursor: pointer; }
+.pill {
+  appearance: none;
+  background: #0e1a29;
+  border: 1px solid #1f2d40;
+  border-radius: 12px;
+  padding: 8px 14px;
+  color: #c6d6e8;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
