@@ -14,7 +14,7 @@ function Dashboard() {
   const totalPlayers = players.length;
   const avgRating =
     players.length > 0
-      ? (players.reduce((sum, p) => sum + p.score_total, 0) / players.length).toFixed(2)
+      ? (players.reduce((sum, p) => sum + p.score, 0) / players.length).toFixed(2)
       : 0;
   const top5 = players.slice(0, 5);
 
@@ -36,7 +36,7 @@ function Dashboard() {
       <ul>
         {top5.map((p, i) => (
           <li key={i}>
-            {p.rank}. {p.namePlayer} – {p.score_total.toFixed(3)}
+            {p.rank}. {p.namePlayer} – {p.score?.toFixed(1)}
           </li>
         ))}
       </ul>

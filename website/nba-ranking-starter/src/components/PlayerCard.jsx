@@ -1,3 +1,4 @@
+import React from "react";
 export default function PlayerCard({name='Player Name', team='TEAM', footer=''}){
   return (
     <div className="panel" style={{display:'grid', gap:12}}>

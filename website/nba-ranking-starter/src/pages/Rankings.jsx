@@ -4,6 +4,8 @@ import API from "../api";
 function Rankings() {
   const [players, setPlayers] = useState([]);
   const [filteredPlayers, setFilteredPlayers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   // Filters
   const [search, setSearch] = useState("");
@@ -14,10 +16,15 @@ function Rankings() {
   useEffect(() => {
     API.get("/rankings?limit=360")
       .then((r) => {
-        setPlayers(ranking.data);
-        setFilteredPlayers(ranking.data);
+        setPlayers(r.data);
+        setFilteredPlayers(r.data);
+        setLoading(false);
       })
-      .catch((err) => console.error("Error fetching rankings:", err));
+      .catch((err) => {
+        console.error("Error fetching rankings:", err);
+        setError("Failed to fetch data from API");
+        setLoading(false);
+      });
   }, []);
 
   // Apply filters
@@ -29,11 +36,9 @@ function Rankings() {
         p.namePlayer?.toLowerCase().includes(search.toLowerCase())
       );
     }
-
     if (teamFilter !== "All") {
       data = data.filter((p) => p.team === teamFilter);
     }
-
     if (positionFilter !== "All") {
       data = data.filter((p) => p.pos === positionFilter);
     }
@@ -44,6 +49,9 @@ function Rankings() {
   // Unique filters
   const teams = ["All", ...new Set(players.map((p) => p.team).filter(Boolean))];
   const positions = ["All", ...new Set(players.map((p) => p.pos).filter(Boolean))];
+
+  if (loading) return <h2 style={{ color: "white" }}>Loading player rankings...</h2>;
+  if (error) return <h2 style={{ color: "red" }}>{error}</h2>;
 
   return (
     <div className="page container">
@@ -72,9 +80,7 @@ function Rankings() {
           onChange={(e) => setTeamFilter(e.target.value)}
         >
           {teams.map((t, i) => (
-            <option key={i} value={t}>
-              {t}
-            </option>
+            <option key={i} value={t}>{t}</option>
           ))}
         </select>
 
@@ -84,9 +90,7 @@ function Rankings() {
           onChange={(e) => setPositionFilter(e.target.value)}
         >
           {positions.map((pos, i) => (
-            <option key={i} value={pos}>
-              {pos}
-            </option>
+            <option key={i} value={pos}>{pos}</option>
           ))}
         </select>
       </div>

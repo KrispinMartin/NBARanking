@@ -17,9 +17,19 @@ cors <- function(req, res) {
 }
 
 # ------------------------------
-# Load single CSV (res.csv)
+# Load CSVs
 # ------------------------------
 rankings <- read.csv("ranking_model.csv")
+stats    <- read.csv("nba_all_stats.csv")
+
+# ------------------------------
+# Join to add headshot_href
+# ------------------------------
+rankings <- rankings %>%
+  left_join(
+    stats %>% select(full_name, headshot_href),
+    by = c("namePlayer" = "full_name")
+  )
 
 # ------------------------------
 # Rankings endpoint
@@ -31,7 +41,7 @@ function(limit = 360) {
       rank,
       namePlayer,
       team = team_abbreviation,
-      pos = position_abbreviation,
+      pos  = position_abbreviation,
       headshot_href,
       score = round(TOTAL_100, 1)
     ) %>%
@@ -51,7 +61,7 @@ function(player1 = "", player2 = "", player3 = "", player4 = "") {
       rank,
       namePlayer,
       team = team_abbreviation,
-      pos = position_abbreviation,
+      pos  = position_abbreviation,
       headshot_href,
       score = round(TOTAL_100, 1)
     )

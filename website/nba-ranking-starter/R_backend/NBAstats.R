@@ -95,7 +95,7 @@ player_stats_list <- lapply(merged_exact$athlete_id, function(id) {
 
 print(recent_season)
 print(class(recent_season))
-# Combine All Stats into One DataFrame
+    # Combine All Stats into One DataFrame
 all_stats <- bind_rows(player_stats_list)
 
 all_stats
@@ -211,7 +211,7 @@ res <- res %>%
     DEF_100     = scale_logistic(Z_DEF),
     TOTAL_100   = scale_logistic(score_total)
   ) %>%
-  select(rank, namePlayer, position_abbreviation, team_abbreviation, TOTAL_100)
+  select(rank, headshot_href, namePlayer, position_abbreviation, team_abbreviation, TOTAL_100)
 
 #Hot and Cold Streak
 library(nbastatR)
