@@ -1,19 +1,41 @@
-.playerGrid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
-@media (max-width: 1000px){ .playerGrid { grid-template-columns: repeat(2, 1fr); } }
-
-.dropdown {
-  background: transparent;
-  border: none;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-  outline: none;
-  padding: 6px 10px;
-  border-radius: 8px;
-  appearance: none; /* remove default arrow */
+.compareContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  gap: 2rem;
 }
 
-.dropdown option {
-  background: #0e1a29; /* dropdown menu bg */
-  color: #fff;
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.filters {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.darkSelect {
+  min-width: 200px;
+  color: #f1f5f9;
+}
+
+.darkButton {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.darkButton:hover {
+  background-color: #334155;
 }
