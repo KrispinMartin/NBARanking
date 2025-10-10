@@ -7,7 +7,7 @@ import {
 import API from "../api";
 import PlayerCard from "../components/PlayerCard";
 
-// SearchableSelect with dark theme
+// --- 1️⃣ SearchableSelect (for players)
 function SearchableSelect({ options, value, onChange, placeholder, isClearable, style }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,14 +23,10 @@ function SearchableSelect({ options, value, onChange, placeholder, isClearable, 
           background: "#1a2332",
           border: "2px solid #2d3e52",
           borderRadius: "12px",
-          padding: "12px 16px",
-          cursor: "pointer",
-          fontSize: "14px",
-          fontWeight: "500",
+          padding: "10px 14px",
           display: "flex",
-          justifyContent: "space-between",
           alignItems: "center",
-          minWidth: "200px",
+          justifyContent: "space-between",
         }}
       >
         <input
@@ -43,76 +39,57 @@ function SearchableSelect({ options, value, onChange, placeholder, isClearable, 
             background: "transparent",
             border: "none",
             outline: "none",
-            color: value ? "#ffffff" : "#64748b",
+            color: "#fff",
             fontSize: "14px",
             fontWeight: "500",
             width: "100%",
-            cursor: "pointer",
+            cursor: "text",
           }}
         />
-        <span style={{ color: "#64748b", marginLeft: "8px" }}>▼</span>
+        <span style={{ color: "#64748b", marginLeft: "8px", cursor: "pointer" }}>▼</span>
       </div>
 
       {isOpen && (
         <>
           <div
-            onClick={() => {
-              setIsOpen(false);
-              setSearchTerm("");
-            }}
-            style={{
-              position: "fixed", top: 0, left: 0,
-              right: 0, bottom: 0, zIndex: 998,
-            }}
+            onClick={() => { setIsOpen(false); setSearchTerm(""); }}
+            style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 998 }}
           />
           <div style={{
             position: "absolute", top: "100%", left: 0, right: 0,
-            marginTop: "8px", background: "#1a2332",
+            marginTop: "6px", background: "#1a2332",
             border: "2px solid #2d3e52", borderRadius: "12px",
-            maxHeight: "300px", overflowY: "auto",
-            zIndex: 999, boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+            maxHeight: "300px", overflowY: "auto", zIndex: 999
           }}>
             {isClearable && value && (
               <div
-                onClick={() => {
-                  onChange(null);
-                  setIsOpen(false);
-                  setSearchTerm("");
-                }}
+                onClick={() => { onChange(null); setIsOpen(false); setSearchTerm(""); }}
                 style={{
-                  padding: "12px 16px", color: "#ef4444",
-                  cursor: "pointer", fontSize: "14px",
-                  borderBottom: "1px solid #2d3e52",
-                  fontWeight: "500",
+                  padding: "10px 16px", color: "#ef4444",
+                  borderBottom: "1px solid #2d3e52", cursor: "pointer",
                 }}
               >
                 Clear Selection
               </div>
             )}
             {filteredOptions.length > 0 ? (
-              filteredOptions.map((option, idx) => (
+              filteredOptions.map((opt, i) => (
                 <div
-                  key={idx}
-                  onClick={() => {
-                    onChange(option);
-                    setIsOpen(false);
-                    setSearchTerm("");
-                  }}
+                  key={i}
+                  onClick={() => { onChange(opt); setIsOpen(false); setSearchTerm(""); }}
                   style={{
-                    padding: "12px 16px", color: "#ffffff",
-                    cursor: "pointer", fontSize: "14px", fontWeight: "500",
-                    background: value?.value === option.value ? "#2d3e5220" : "transparent",
+                    padding: "10px 16px", color: "#fff",
+                    background: value?.value === opt.value ? "#2d3e5233" : "transparent",
+                    cursor: "pointer",
                   }}
                   onMouseEnter={(e) => e.target.style.background = "#2d3e5240"}
-                  onMouseLeave={(e) => e.target.style.background = value?.value === option.value ? "#2d3e5220" : "transparent"}
+                  onMouseLeave={(e) => e.target.style.background = value?.value === opt.value ? "#2d3e5233" : "transparent"}
                 >
-                  {option.label}
+                  {opt.label}
                 </div>
               ))
             ) : (
-              <div style={{ padding: "12px 16px", color: "#64748b", fontSize: "14px" }}>
-                No players found
-              </div>
+              <div style={{ padding: "10px 16px", color: "#64748b" }}>No players found</div>
             )}
           </div>
         </>
@@ -121,7 +98,61 @@ function SearchableSelect({ options, value, onChange, placeholder, isClearable, 
   );
 }
 
-// Custom Tooltip for Radar Chart
+// --- 2️⃣ SimpleSelect (for Compare Mode, no typing)
+function SimpleSelect({ options, value, onChange, placeholder, style }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div style={{ position: "relative", ...style }}>
+      <div
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          background: "#1a2332",
+          border: "2px solid #2d3e52",
+          borderRadius: "12px",
+          padding: "12px 16px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          cursor: "pointer",
+          color: "#fff",
+          fontSize: "14px",
+          minWidth: "200px",
+        }}
+      >
+        {value ? value.label : placeholder}
+        <span style={{ color: "#64748b" }}>▼</span>
+      </div>
+
+      {isOpen && (
+        <div style={{
+          position: "absolute", top: "100%", left: 0, right: 0,
+          background: "#1a2332", border: "2px solid #2d3e52",
+          borderRadius: "12px", marginTop: "6px", zIndex: 999
+        }}>
+          {options.map((opt, i) => (
+            <div
+              key={i}
+              onClick={() => { onChange(opt); setIsOpen(false); }}
+              style={{
+                padding: "10px 14px",
+                color: value?.value === opt.value ? "#3b82f6" : "#fff",
+                background: value?.value === opt.value ? "#2d3e5233" : "transparent",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => e.target.style.background = "#2d3e5240"}
+              onMouseLeave={(e) => e.target.style.background = value?.value === opt.value ? "#2d3e5233" : "transparent"}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// --- Custom Tooltip ---
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
@@ -131,11 +162,11 @@ const CustomTooltip = ({ active, payload }) => {
         borderRadius: "8px",
         padding: "12px",
       }}>
-        <p style={{ color: "#94a3b8", fontSize: "12px", margin: "0 0 8px 0", fontWeight: "600" }}>
+        <p style={{ color: "#94a3b8", fontSize: "12px", marginBottom: "6px" }}>
           {payload[0].payload.stat}
         </p>
-        {payload.map((entry, index) => (
-          <p key={index} style={{ color: entry.color, fontSize: "14px", margin: "4px 0", fontWeight: "600" }}>
+        {payload.map((entry, i) => (
+          <p key={i} style={{ color: entry.color, fontSize: "14px", margin: "3px 0" }}>
             {entry.name}: {entry.value.toFixed(1)}
           </p>
         ))}
@@ -145,7 +176,6 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
-// Helper function to get stat value from player object with multiple fallbacks
 function getStatValue(player, ...keys) {
   for (let key of keys) {
     if (player[key] !== undefined && player[key] !== null) {
@@ -155,6 +185,7 @@ function getStatValue(player, ...keys) {
   return 0;
 }
 
+// --- MAIN ---
 export default function Compare() {
   const [players, setPlayers] = useState([]);
   const [numSlots, setNumSlots] = useState(2);
@@ -170,181 +201,157 @@ export default function Compare() {
   }, []);
 
   const handleCompare = () => {
-    const query = selected
-      .slice(0, numSlots)
-      .filter(Boolean)
+    const validPlayers = selected.slice(0, numSlots).filter(Boolean);
+    if (validPlayers.length === 0) return;
+
+    const query = validPlayers
       .map((p, i) => `player${i + 1}=${encodeURIComponent(p.value)}`)
       .join("&");
 
-    if (query) {
-      API.get(`/compare?${query}`)
-        .then((res) => {
-          console.log("Compare API response:", res.data); // Debug log
-          setCompareData(res.data);
-        })
-        .catch((err) => console.error("Error comparing players:", err));
-    }
+    API.get(`/compare?${query}`)
+      .then((res) => setCompareData(res.data))
+      .catch((err) => console.error("Error comparing players:", err));
   };
 
-  // Build radar data with fallback field names
+  const playerOptions = players
+    .filter((p) => (!teamFilter || p.team === teamFilter.value) && (!posFilter || p.pos === posFilter.value))
+    .map((p) => ({ value: p.namePlayer, label: p.namePlayer }));
+
+  const teamOptions = [...new Set(players.map((p) => p.team))].map((t) => ({ value: t, label: t }));
+  const posOptions = [...new Set(players.map((p) => p.pos))].map((p) => ({ value: p, label: p }));
+  const compareModes = [
+    { value: 2, label: "Compare 2 Players" },
+    { value: 3, label: "Compare 3 Players" },
+    { value: 4, label: "Compare 4 Players" },
+  ];
+
+  const colors = ["#3b82f6", "#f97316", "#22c55e", "#e11d48"];
+
   const radarData = [
-    { stat: "Impact", keys: ["IMPACT_100", "impact_100", "impact", "IMPACT"] },
-    { stat: "Scoring", keys: ["SCORING_100", "scoring_100", "scoring", "SCORING"] },
-    { stat: "Playmaking", keys: ["PLAY_100", "playmaking_100", "playmaking", "PLAYMAKING", "PLAY"] },
-    { stat: "Rebounding", keys: ["REB_100", "rebounding_100", "rebounding", "REBOUNDING", "REB"] },
-    { stat: "Discipline", keys: ["DISC_100", "discipline_100", "discipline", "DISCIPLINE", "DISC"] },
-    { stat: "Defense", keys: ["DEF_100", "defense_100", "defense", "DEFENSE", "DEF"] }
+    { stat: "Impact", keys: ["impact", "IMPACT", "IMPACT_100"] },
+    { stat: "Scoring", keys: ["scoring", "SCORING", "SCORING_100"] },
+    { stat: "Playmaking", keys: ["playmaking", "PLAY", "PLAY_100"] },
+    { stat: "Rebounding", keys: ["rebounding", "REB", "REB_100"] },
+    { stat: "Discipline", keys: ["discipline", "DISC", "DISC_100"] },
+    { stat: "Defense", keys: ["defense", "DEF", "DEF_100"] },
   ].map((statInfo) => {
-    let row = { stat: statInfo.stat };
+    const row = { stat: statInfo.stat };
     compareData.forEach((p) => {
       row[p.namePlayer] = getStatValue(p, ...statInfo.keys);
     });
     return row;
   });
 
-  const playerOptions = players
-    .filter((p) => {
-      if (teamFilter && p.team !== teamFilter.value) return false;
-      if (posFilter && p.pos !== posFilter.value) return false;
-      return true;
-    })
-    .map((p) => ({ value: p.namePlayer, label: p.namePlayer }));
-
-  const teamOptions = [...new Set(players.map((p) => p.team))].map((t) => ({ value: t, label: t }));
-  const posOptions = [...new Set(players.map((p) => p.pos))].map((p) => ({ value: p, label: p }));
-
-  const colors = ["#3b82f6", "#f97316", "#22c55e", "#e11d48"];
-
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#0f172a",
-      padding: "40px 20px",
-    }}>
+    <div style={{ minHeight: "100vh", background: "#0f172a", padding: "40px 20px" }}>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
         <h1 style={{
-          color: "#ffffff",
-          fontSize: "42px",
-          fontWeight: "700",
-          textAlign: "center",
-          marginBottom: "40px",
+          color: "#fff", fontSize: "42px", fontWeight: 700,
+          textAlign: "center", marginBottom: "40px",
         }}>
           Compare Players
         </h1>
 
-        {/* Filters at top */}
+        {/* Filters & Compare Mode */}
         <div style={{
           display: "flex", justifyContent: "center",
           gap: "16px", marginBottom: "40px", flexWrap: "wrap",
         }}>
           <SearchableSelect options={teamOptions} value={teamFilter} onChange={setTeamFilter} placeholder="Filter by Team" isClearable />
           <SearchableSelect options={posOptions} value={posFilter} onChange={setPosFilter} placeholder="Filter by Position" isClearable />
+          <SimpleSelect
+            options={compareModes}
+            value={compareModes.find(m => m.value === numSlots)}
+            onChange={(mode) => setNumSlots(mode.value)}
+            placeholder="Compare Mode"
+          />
         </div>
 
-        {/* Player selection */}
+        {/* Player selectors */}
         <div style={{
           display: "flex", justifyContent: "center",
-          gap: "16px", marginBottom: "32px",
-          flexWrap: "wrap", alignItems: "center",
+          gap: "16px", marginBottom: "32px", flexWrap: "wrap",
         }}>
-          {Array.from({ length: numSlots }).map((_, idx) => (
+          {Array.from({ length: numSlots }).map((_, i) => (
             <SearchableSelect
-              key={idx}
+              key={i}
               options={playerOptions}
-              value={selected[idx]}
+              value={selected[i]}
               onChange={(val) => {
-                const newSelected = [...selected];
-                newSelected[idx] = val;
-                setSelected(newSelected);
+                const updated = [...selected];
+                updated[i] = val;
+                setSelected(updated);
               }}
-              placeholder={`Player ${idx + 1}`}
+              placeholder={`Player ${i + 1}`}
               isClearable
-              style={{ minWidth: "240px" }}
             />
           ))}
-
-          {numSlots < 4 && (
-            <button
-              onClick={() => setNumSlots(numSlots + 1)}
-              style={{
-                background: "linear-gradient(135deg, #2d3e52 0%, #1a2332 100%)",
-                border: "2px solid #3b82f6",
-                borderRadius: "12px",
-                color: "#3b82f6",
-                padding: "12px 24px",
-                fontSize: "14px", fontWeight: "600",
-                cursor: "pointer",
-              }}
-            >
-              + ADD PLAYER
-            </button>
-          )}
 
           <button
             onClick={handleCompare}
             style={{
-              background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-              border: "none", borderRadius: "12px",
-              color: "#ffffff", padding: "12px 32px",
-              fontSize: "14px", fontWeight: "700",
+              background: "linear-gradient(135deg, #2563eb 0%, #1e40af 100%)",
+              border: "none",
+              borderRadius: "8px",
+              padding: "10px 22px",
+              color: "#fff",
+              fontWeight: 600,
               cursor: "pointer",
+              boxShadow: "0 0 10px rgba(37,99,235,0.4)",
             }}
           >
             COMPARE
           </button>
         </div>
 
-        {/* Player Cards */}
+        {/* Player Cards & Radar Chart stay same */}
         <div style={{
           display: "flex", justifyContent: "center",
-          gap: "24px", marginBottom: "60px", flexWrap: "wrap",
+          flexWrap: "wrap", gap: "24px", marginBottom: "60px",
         }}>
           {compareData.length > 0 ? (
-            Array.from({ length: numSlots }).map((_, idx) => (
-              <PlayerCard
-                key={idx}
-                player={compareData[idx]}
-                color={colors[idx % colors.length]}
-              />
+            compareData.map((p, i) => (
+              <PlayerCard key={i} player={p} color={colors[i % colors.length]} />
             ))
           ) : (
             <p style={{
-              color: "#64748b", fontSize: "18px",
-              textAlign: "center", padding: "60px 20px",
-              fontWeight: "500",
+              color: "#64748b", fontSize: "18px", textAlign: "center",
+              padding: "60px 20px", fontWeight: "500",
             }}>
               Select players and click COMPARE to view stats
             </p>
           )}
         </div>
 
-        {/* Radar Chart */}
         {compareData.length > 0 && (
           <div style={{
             background: "linear-gradient(135deg, #1a2332 0%, #0f1824 100%)",
-            borderRadius: "20px", padding: "40px 20px",
-            marginTop: "40px", border: "2px solid #2d3e52",
+            borderRadius: "20px",
+            padding: "40px 20px",
+            border: "2px solid #2d3e52",
           }}>
             <h2 style={{
-              color: "#ffffff", fontSize: "28px",
-              fontWeight: "700", textAlign: "center",
+              color: "#fff",
+              fontSize: "28px",
+              textAlign: "center",
               marginBottom: "30px",
             }}>
               Statistical Comparison
             </h2>
+
             <ResponsiveContainer width="100%" height={500}>
               <RadarChart data={radarData}>
                 <PolarGrid stroke="#2d3e52" />
                 <PolarAngleAxis dataKey="stat" tick={{ fill: "#94a3b8", fontSize: 14, fontWeight: 600 }} />
                 <PolarRadiusAxis domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 12 }} stroke="#2d3e52" />
                 <Tooltip content={<CustomTooltip />} />
-                {compareData.map((p, idx) => (
+                {compareData.map((p, i) => (
                   <Radar
                     key={p.namePlayer}
                     name={p.namePlayer}
                     dataKey={p.namePlayer}
-                    stroke={colors[idx % colors.length]}
-                    fill={colors[idx % colors.length]}
+                    stroke={colors[i % colors.length]}
+                    fill={colors[i % colors.length]}
                     fillOpacity={0.25}
                     strokeWidth={3}
                   />
