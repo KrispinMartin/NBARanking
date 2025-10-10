@@ -47,8 +47,8 @@ function Rankings() {
   }, [search, teamFilter, positionFilter, players]);
 
   // Unique filters
-  const teams = ["All", ...new Set(players.map((p) => p.team).filter(Boolean))];
-  const positions = ["All", ...new Set(players.map((p) => p.pos).filter(Boolean))];
+  const teams = ["All TEAMS", ...new Set(players.map((p) => p.team).filter(Boolean))];
+  const positions = ["All POSITIONS ", ...new Set(players.map((p) => p.pos).filter(Boolean))];
 
   if (loading) return <h2 style={{ color: "white" }}>Loading player rankings...</h2>;
   if (error) return <h2 style={{ color: "red" }}>{error}</h2>;

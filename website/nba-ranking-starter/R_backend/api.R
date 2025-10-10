@@ -72,3 +72,47 @@ function(player1 = "", player2 = "", player3 = "", player4 = "") {
     )
 }
 
+# ------------------------------
+# Load CSVs for hot/cold trends
+# ------------------------------
+trend5 <- read.csv("nba_trends_page_5.csv")
+trend10 <- read.csv("nba_trends_page_10.csv")
+
+# Trends endpoint
+# ------------------------------
+#* @get /trends
+# Returns top 10 "hot" and bottom 10 "cold" players based on total streak scores
+function(range = 5, limit = 10) {
+  range <- as.numeric(range)
+  data <- if (range == 10) trend10 else trend5
+  
+  # Clean up missing data just in case
+  data[is.na(data)] <- 0
+  
+  # Sort descending for hot players and ascending for cold players
+  hot <- data %>%
+    arrange(desc(if (range == 10) streak_total10 else streak_total5)) %>%
+    head(as.numeric(limit)) %>%
+    transmute(
+      player_name,
+      team,
+      position,
+      headshot_href,
+      streak_value = round(if (range == 10) streak_total10 else streak_total5, 1)
+    )
+  
+  cold <- data %>%
+    arrange(if (range == 10) streak_total10 else streak_total5) %>%
+    head(as.numeric(limit)) %>%
+    transmute(
+      player_name,
+      team,
+      position,
+      headshot_href,
+      streak_value = round(if (range == 10) streak_total10 else streak_total5, 1)
+    )
+  
+  # Return as a combined list
+  return(list(hot = hot, cold = cold))
+}
+
