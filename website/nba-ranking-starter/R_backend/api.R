@@ -24,27 +24,52 @@ cors <- function(req, res) {
 # ------------------------------
 rankings <- read.csv("ranking_model.csv")
 stats    <- read.csv("nba_player_comparison.csv")
-
 # ------------------------------
-# Rankings endpoint
+# Rankings endpoint (DYNAMIC STAT FILTER)
 # ------------------------------
 #* @get /rankings
-function(limit = 360) {
-  rankings %>%
+#* @param limit:number The number of players to return
+#* @param stat The metric to rank players by (TOTAL_100, IMPACT_100, SCORING_100, PLAY_100, REB_100, DISC_100, DEF_100)
+function(limit = 360, stat = "TOTAL_100") {
+  
+  # Valid stats
+  valid_stats <- c("TOTAL_100", "IMPACT_100", "SCORING_100", "PLAY_100", "REB_100", "DISC_100", "DEF_100")
+  if (!(stat %in% valid_stats)) stat <- "TOTAL_100"
+  
+  # Clean join – take team/pos from rankings, stats from nba_player_comparison
+  merged <- stats %>%
     left_join(
-      stats %>% select(player_name, headshot_href),
-      by = c("namePlayer" = "player_name")
+      rankings %>%
+        select(namePlayer, team_abbreviation, position_abbreviation),
+      by = c("player_name" = "namePlayer")
     ) %>%
+    mutate(
+      team = coalesce(team, team_abbreviation),
+      pos = coalesce(position, position_abbreviation)
+    )
+  
+  # Compute TOTAL_100 if missing (safety)
+  if (!"TOTAL_100" %in% names(merged)) {
+    cols <- intersect(c("IMPACT_100", "SCORING_100", "PLAY_100", "REB_100", "DISC_100", "DEF_100"), names(merged))
+    merged <- merged %>%
+      mutate(TOTAL_100 = rowMeans(select(., all_of(cols)), na.rm = TRUE))
+  }
+  
+  # Create clean output
+  merged %>%
+    mutate(score = round(.data[[stat]], 1)) %>%
+    arrange(desc(score)) %>%
     transmute(
-      rank,
-      namePlayer,
-      team = team_abbreviation,
-      pos  = position_abbreviation,
-      headshot_href,                       # ✅ comes from stats now
-      score = round(TOTAL_100, 1)          # ✅ comes from ranking_model.csv
+      rank = row_number(),
+      namePlayer = player_name,
+      team,
+      pos,
+      headshot_href,
+      score
     ) %>%
     head(as.numeric(limit))
 }
+
 
 # ------------------------------
 # Compare endpoint
@@ -58,7 +83,7 @@ function(player1 = "", player2 = "", player3 = "", player4 = "") {
     filter(player_name %in% players) %>%
     transmute(
       rank,
-      namePlayer = player_name,            # ✅ rename to match frontend
+      namePlayer = player_name,
       team,
       pos = position,
       headshot_href,
@@ -73,23 +98,17 @@ function(player1 = "", player2 = "", player3 = "", player4 = "") {
 }
 
 # ------------------------------
-# Load CSVs for hot/cold trends
-# ------------------------------
-trend5 <- read.csv("nba_trends_page_5.csv")
-trend10 <- read.csv("nba_trends_page_10.csv")
-
 # Trends endpoint
 # ------------------------------
+trend5  <- read.csv("nba_trends_page_5.csv")
+trend10 <- read.csv("nba_trends_page_10.csv")
+
 #* @get /trends
-# Returns top 10 "hot" and bottom 10 "cold" players based on total streak scores
 function(range = 5, limit = 10) {
   range <- as.numeric(range)
   data <- if (range == 10) trend10 else trend5
-  
-  # Clean up missing data just in case
   data[is.na(data)] <- 0
   
-  # Sort descending for hot players and ascending for cold players
   hot <- data %>%
     arrange(desc(if (range == 10) streak_total10 else streak_total5)) %>%
     head(as.numeric(limit)) %>%
@@ -112,7 +131,6 @@ function(range = 5, limit = 10) {
       streak_value = round(if (range == 10) streak_total10 else streak_total5, 1)
     )
   
-  # Return as a combined list
   return(list(hot = hot, cold = cold))
 }
 

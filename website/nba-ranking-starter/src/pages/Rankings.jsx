@@ -11,10 +11,23 @@ function Rankings() {
   const [search, setSearch] = useState("");
   const [teamFilter, setTeamFilter] = useState("All Teams");
   const [positionFilter, setPositionFilter] = useState("All Positions");
+  const [statFilter, setStatFilter] = useState("TOTAL_100");
 
-  // Load players from API
+  // Advanced stat options (from your CSV)
+  const statOptions = [
+    "IMPACT_100",
+    "SCORING_100",
+    "PLAY_100",
+    "REB_100",
+    "DISC_100",
+    "DEF_100",
+    "TOTAL_100",
+  ];
+
+  // Fetch players when stat changes
   useEffect(() => {
-    API.get("/rankings?limit=360")
+    setLoading(true);
+    API.get(`/rankings?limit=360&stat=${statFilter}`)
       .then((r) => {
         setPlayers(r.data);
         setFilteredPlayers(r.data);
@@ -25,25 +38,22 @@ function Rankings() {
         setError("Failed to fetch data from API");
         setLoading(false);
       });
-  }, []);
+  }, [statFilter]);
 
-  // Apply filters
+  // Apply search + filters
   useEffect(() => {
-    let data = players;
+    let data = [...players];
 
-    // Search filter
     if (search) {
       data = data.filter((p) =>
         p.namePlayer?.toLowerCase().includes(search.toLowerCase())
       );
     }
 
-    // Team filter
     if (teamFilter !== "All Teams") {
       data = data.filter((p) => p.team === teamFilter);
     }
 
-    // Position filter
     if (positionFilter !== "All Positions") {
       data = data.filter((p) => p.pos === positionFilter);
     }
@@ -51,7 +61,7 @@ function Rankings() {
     setFilteredPlayers(data);
   }, [search, teamFilter, positionFilter, players]);
 
-  // Unique filters
+  // Unique filter values
   const teams = ["All Teams", ...new Set(players.map((p) => p.team).filter(Boolean))];
   const positions = ["All Positions", ...new Set(players.map((p) => p.pos).filter(Boolean))];
 
@@ -63,7 +73,16 @@ function Rankings() {
       <h1>Player Rankings</h1>
 
       {/* Search + Filters */}
-      <div style={{ display: "flex", gap: "12px", marginBottom: "16px" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          marginBottom: "16px",
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        {/* Smaller Search Bar */}
         <input
           type="text"
           placeholder="Search player..."
@@ -75,10 +94,12 @@ function Rankings() {
             border: "1px solid #1f2d40",
             background: "#0e1a29",
             color: "#eaf2fb",
-            flex: "1",
+            flex: "0.8",
+            minWidth: "200px",
           }}
         />
 
+        {/* Team Filter */}
         <select
           className="pill"
           value={teamFilter}
@@ -91,6 +112,7 @@ function Rankings() {
           ))}
         </select>
 
+        {/* Position Filter */}
         <select
           className="pill"
           value={positionFilter}
@@ -99,6 +121,19 @@ function Rankings() {
           {positions.map((pos, i) => (
             <option key={i} value={pos}>
               {pos}
+            </option>
+          ))}
+        </select>
+
+        {/* Stat Filter */}
+        <select
+          className="pill"
+          value={statFilter}
+          onChange={(e) => setStatFilter(e.target.value)}
+        >
+          {statOptions.map((s, i) => (
+            <option key={i} value={s}>
+              {s.replace("_100", "").replace("_", " ")}
             </option>
           ))}
         </select>
@@ -112,7 +147,7 @@ function Rankings() {
             <th>Player</th>
             <th>Team</th>
             <th>Pos</th>
-            <th>Score</th>
+            <th>{statFilter.replace("_100", "")}</th>
           </tr>
         </thead>
         <tbody>
@@ -151,7 +186,9 @@ function Rankings() {
                 <td>{p.team || "N/A"}</td>
                 <td>{p.pos || "N/A"}</td>
                 <td>
-                  <span className="badge up">{p.score?.toFixed(1)}</span>
+                  <span className="badge up">
+                    {p.score ? p.score.toFixed(1) : "—"}
+                  </span>
                 </td>
               </tr>
             ))
