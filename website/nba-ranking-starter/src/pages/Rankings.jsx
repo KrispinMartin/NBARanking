@@ -9,8 +9,8 @@ function Rankings() {
 
   // Filters
   const [search, setSearch] = useState("");
-  const [teamFilter, setTeamFilter] = useState("All");
-  const [positionFilter, setPositionFilter] = useState("All");
+  const [teamFilter, setTeamFilter] = useState("All Teams");
+  const [positionFilter, setPositionFilter] = useState("All Positions");
 
   // Load players from API
   useEffect(() => {
@@ -31,15 +31,20 @@ function Rankings() {
   useEffect(() => {
     let data = players;
 
+    // Search filter
     if (search) {
       data = data.filter((p) =>
         p.namePlayer?.toLowerCase().includes(search.toLowerCase())
       );
     }
-    if (teamFilter !== "All") {
+
+    // Team filter
+    if (teamFilter !== "All Teams") {
       data = data.filter((p) => p.team === teamFilter);
     }
-    if (positionFilter !== "All") {
+
+    // Position filter
+    if (positionFilter !== "All Positions") {
       data = data.filter((p) => p.pos === positionFilter);
     }
 
@@ -47,8 +52,8 @@ function Rankings() {
   }, [search, teamFilter, positionFilter, players]);
 
   // Unique filters
-  const teams = ["All TEAMS", ...new Set(players.map((p) => p.team).filter(Boolean))];
-  const positions = ["All POSITIONS ", ...new Set(players.map((p) => p.pos).filter(Boolean))];
+  const teams = ["All Teams", ...new Set(players.map((p) => p.team).filter(Boolean))];
+  const positions = ["All Positions", ...new Set(players.map((p) => p.pos).filter(Boolean))];
 
   if (loading) return <h2 style={{ color: "white" }}>Loading player rankings...</h2>;
   if (error) return <h2 style={{ color: "red" }}>{error}</h2>;
@@ -80,7 +85,9 @@ function Rankings() {
           onChange={(e) => setTeamFilter(e.target.value)}
         >
           {teams.map((t, i) => (
-            <option key={i} value={t}>{t}</option>
+            <option key={i} value={t}>
+              {t}
+            </option>
           ))}
         </select>
 
@@ -90,7 +97,9 @@ function Rankings() {
           onChange={(e) => setPositionFilter(e.target.value)}
         >
           {positions.map((pos, i) => (
-            <option key={i} value={pos}>{pos}</option>
+            <option key={i} value={pos}>
+              {pos}
+            </option>
           ))}
         </select>
       </div>
