@@ -21,7 +21,7 @@ function Rankings() {
     "REB_100",
     "DISC_100",
     "DEF_100",
-    "TOTAL_100",
+    "TOTAL_100"
   ];
 
   // Fetch players when stat changes
@@ -62,10 +62,17 @@ function Rankings() {
   }, [search, teamFilter, positionFilter, players]);
 
   // Unique filter values
-  const teams = ["All Teams", ...new Set(players.map((p) => p.team).filter(Boolean))];
-  const positions = ["All Positions", ...new Set(players.map((p) => p.pos).filter(Boolean))];
+  const teams = [
+    "All Teams",
+    ...new Set(players.map((p) => p.team).filter(Boolean))
+  ];
+  const positions = [
+    "All Positions",
+    ...new Set(players.map((p) => p.pos).filter(Boolean))
+  ];
 
-  if (loading) return <h2 style={{ color: "white" }}>Loading player rankings...</h2>;
+  if (loading)
+    return <h2 style={{ color: "white" }}>Loading player rankings...</h2>;
   if (error) return <h2 style={{ color: "red" }}>{error}</h2>;
 
   return (
@@ -79,7 +86,7 @@ function Rankings() {
           gap: "10px",
           marginBottom: "16px",
           flexWrap: "wrap",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         {/* Smaller Search Bar */}
@@ -95,7 +102,7 @@ function Rankings() {
             background: "#0e1a29",
             color: "#eaf2fb",
             flex: "0.8",
-            minWidth: "200px",
+            minWidth: "200px"
           }}
         />
 
@@ -131,11 +138,22 @@ function Rankings() {
           value={statFilter}
           onChange={(e) => setStatFilter(e.target.value)}
         >
-          {statOptions.map((s, i) => (
-            <option key={i} value={s}>
-              {s.replace("_100", "").replace("_", " ")}
-            </option>
-          ))}
+          {statOptions.map((s, i) => {
+            const labels = {
+              IMPACT_100: "Impact",
+              SCORING_100: "Scoring",
+              PLAY_100: "Playmaking",
+              REB_100: "Rebounding",
+              DISC_100: "Discipline",
+              DEF_100: "Defence",
+              TOTAL_100: "Overall"
+            };
+            return (
+              <option key={i} value={s}>
+                {labels[s] || s}
+              </option>
+            );
+          })}
         </select>
       </div>
 
@@ -147,7 +165,17 @@ function Rankings() {
             <th>Player</th>
             <th>Team</th>
             <th>Pos</th>
-            <th>{statFilter.replace("_100", "")}</th>
+            <th>
+              {{
+                IMPACT_100: "Impact",
+                SCORING_100: "Scoring",
+                PLAY_100: "Playmaking",
+                REB_100: "Rebounding",
+                DISC_100: "Discipline",
+                DEF_100: "Defence",
+                TOTAL_100: "Overall"
+              }[statFilter] || statFilter.replace("_100", "")}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -159,7 +187,9 @@ function Rankings() {
             filteredPlayers.map((p, i) => (
               <tr key={i}>
                 <td>{p.rank}</td>
-                <td style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <td
+                  style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                >
                   {p.headshot_href ? (
                     <img
                       src={p.headshot_href}
@@ -168,7 +198,7 @@ function Rankings() {
                         width: "32px",
                         height: "32px",
                         borderRadius: "50%",
-                        objectFit: "cover",
+                        objectFit: "cover"
                       }}
                     />
                   ) : (
@@ -177,7 +207,7 @@ function Rankings() {
                         width: "32px",
                         height: "32px",
                         borderRadius: "50%",
-                        background: "#13263d",
+                        background: "#13263d"
                       }}
                     />
                   )}
