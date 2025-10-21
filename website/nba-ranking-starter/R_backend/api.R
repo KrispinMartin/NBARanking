@@ -4,7 +4,7 @@ library(dplyr)
 #* @apiTitle NBA Ranking API
 
 # ------------------------------
-# Enable CORS
+# Enable CORS (for frontend calls)
 # ------------------------------
 #* @filter cors
 cors <- function(req, res) {
@@ -20,10 +20,13 @@ cors <- function(req, res) {
 }
 
 # ------------------------------
-# Load CSVs
+# Load CSVs (ensure these are in /app folder in Docker)
 # ------------------------------
 rankings <- read.csv("ranking_model.csv")
 stats    <- read.csv("nba_player_comparison.csv")
+trend5   <- read.csv("nba_trends_page_5.csv")
+trend10  <- read.csv("nba_trends_page_10.csv")
+
 # ------------------------------
 # Rankings endpoint (DYNAMIC STAT FILTER)
 # ------------------------------
@@ -32,11 +35,9 @@ stats    <- read.csv("nba_player_comparison.csv")
 #* @param stat The metric to rank players by (TOTAL_100, IMPACT_100, SCORING_100, PLAY_100, REB_100, DISC_100, DEF_100)
 function(limit = 360, stat = "TOTAL_100") {
   
-  # Valid stats
   valid_stats <- c("TOTAL_100", "IMPACT_100", "SCORING_100", "PLAY_100", "REB_100", "DISC_100", "DEF_100")
   if (!(stat %in% valid_stats)) stat <- "TOTAL_100"
   
-  # Clean join – take team/pos from rankings, stats from nba_player_comparison
   merged <- stats %>%
     left_join(
       rankings %>%
@@ -48,14 +49,12 @@ function(limit = 360, stat = "TOTAL_100") {
       pos = coalesce(position, position_abbreviation)
     )
   
-  # Compute TOTAL_100 if missing (safety)
   if (!"TOTAL_100" %in% names(merged)) {
     cols <- intersect(c("IMPACT_100", "SCORING_100", "PLAY_100", "REB_100", "DISC_100", "DEF_100"), names(merged))
     merged <- merged %>%
       mutate(TOTAL_100 = rowMeans(select(., all_of(cols)), na.rm = TRUE))
   }
   
-  # Create clean output
   merged %>%
     mutate(score = round(.data[[stat]], 1)) %>%
     arrange(desc(score)) %>%
@@ -69,7 +68,6 @@ function(limit = 360, stat = "TOTAL_100") {
     ) %>%
     head(as.numeric(limit))
 }
-
 
 # ------------------------------
 # Compare endpoint
@@ -100,9 +98,6 @@ function(player1 = "", player2 = "", player3 = "", player4 = "") {
 # ------------------------------
 # Trends endpoint
 # ------------------------------
-trend5  <- read.csv("nba_trends_page_5.csv")
-trend10 <- read.csv("nba_trends_page_10.csv")
-
 #* @get /trends
 function(range = 5, limit = 10) {
   range <- as.numeric(range)
@@ -131,6 +126,11 @@ function(range = 5, limit = 10) {
       streak_value = round(if (range == 10) streak_total10 else streak_total5, 1)
     )
   
-  return(list(hot = hot, cold = cold))
+  list(hot = hot, cold = cold)
 }
 
+# ------------------------------
+# Run API (required for Render)
+# ------------------------------
+pr <- plumb("api.R")
+pr$run(host = "0.0.0.0", port = as.numeric(Sys.getenv("PORT", 8080)))
