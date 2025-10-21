@@ -1,17 +1,15 @@
-# Use official R image
-FROM rocker/r-ver:4.3.1
+# Use the Plumber base image
+FROM rocker/plumber:latest
 
-# Install plumber and any dependencies
-RUN R -e "install.packages(c('plumber', 'jsonlite', 'dplyr', 'tidyr', 'stringr', 'lubridate', 'readr'), repos='https://cloud.r-project.org/')"
+# Install any R packages you need
+RUN R -e "install.packages(c('dplyr', 'jsonlite', 'DBI', 'RSQLite'))"
 
-# Set the working directory inside the container
+# Copy your API
 WORKDIR /app
-
-# Copy your R backend files into the container
 COPY . /app
 
-# Expose the port that Render will use
-EXPOSE 8000
+# Expose the port
+EXPOSE 8080
 
-# Run your plumber API
-CMD ["R", "-e", "pr <- plumber::plumb('api.R'); pr$run(host='0.0.0.0', port=8000)"]
+# Run the API
+CMD ["R", "-e", "pr <- plumber::plumb('plumber.R'); pr$run(host='0.0.0.0', port=8080)"]
